@@ -4,7 +4,6 @@ import tensorflow as tf
 import utils
 ##loads graph as a directed graph
 G = nx.read_edgelist(path = "./karate.edgelist", create_using = nx.DiGraph(), data = 'weights')
-## ADD weights values of edges == 1
 ebd_dim = 128 ##embeddings dimension
 r = 10 ##number of walks per nodes
 l = 40 ## length of r-walk
@@ -12,9 +11,8 @@ k = 20 ##context size
 p = 0.5 ##Return parameter of walk
 q = 0.5 ##In-Out parameter of walk
 walks = []
-print(G.edges())
 n_G = utils.start_weights(G)
-print(n_G.edges(data=True))
+n_G.to_undirected()
    
 
 
