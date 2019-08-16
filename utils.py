@@ -28,12 +28,9 @@ def PreProcessModifedWeights(G,p,q):
         alias_edges[edge] = get_alias_edge(edge[0],edge[1],p,q)
         alias_edges[edge[1],edge[0]] = get_alias_edge[edge[1],edge[0],p,q]
 
-
-    
-
     return alias_nodes, alias_edges
 
-def node2VecWalk(n_G,u,l):
+def node2VecWalk(n_G,u,l,alias_nodes,alias_edges):
     """
     Simulates Biased Random Walk from node2vec paper
 
@@ -42,17 +39,23 @@ def node2VecWalk(n_G,u,l):
         n_G {Graph} -- graph to be used in simulation
         u {int} -- starting node for r-walk
         l {int} -- length of the walk
+        alias_nodes {list} - list with nodes processed probabilities of biased random walk
+        alias_edges {list} - list with edges processed probabilities of biased random walk
     Returns:
         walk -- generated biased random walk
     """
-    for node in G.nodes()
-    
     walk = [u]
     for walk_iter in range(l):
         curr = walk[-1]
-        V_curr =  n_G[curr].neighbors()
-        s = alias_draw() ##AliasSample()
+        neighbors =sorted(n_G.neighbors(curr))
+        if len(walk) == 1:
+            s = neighbors[alias_draw(alias_nodes[curr][0],alias_nodes[curr][1])]
+        else:
+            src = walk[-2]
+            s = neighbors[alias_draw(alias_edges[(src,curr)][0], alias_edges[(src,curr)][1])]
+        ##AliasSample()
         walk.append[s]
+    print(walk)
     return walk
 
 
