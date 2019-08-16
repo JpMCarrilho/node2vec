@@ -19,7 +19,6 @@ n_G.to_undirected()
 def __main__():
     n_G = PreProcessModifedWeights(G,p,q)  ##updated Graphs weights
     for n_walk in range(r):
-
         for node in G.nodes():
             walk = node2VecWalk(n_G,node,l)
             walks.append(walk)
