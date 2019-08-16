@@ -15,18 +15,25 @@ def PreProcessModifedWeights(G,p,q):
     Returns:
         n_G -- updated graph
     """
-    alias_nodes =[]
+    alias_nodes = {}
+    print(G.edges(data=True))
     for node in G.nodes():
-        probs = [G[node][nbr]['weight'] for nbr in G.neighbors()]
+        
+        probs = [G[node][nbr]['weights'] for nbr in sorted(G.neighbors(node))]
+        
         Z = sum(probs) ##normalizing constant
-        normalized_probs = [prob/Z for prob in probs]
+        print(probs)
+        normalized_probs = [float(prob/Z) for prob in probs]
         alias_nodes[node] = alias_setup(normalized_probs)
+    print(normalized_probs)
+    #print(alias_nodes)
+        
     
-    alias_edges = []
+    alias_edges = {}
     
     for edge in G.edges():
-        alias_edges[edge] = get_alias_edge(edge[0],edge[1],p,q)
-        alias_edges[edge[1],edge[0]] = get_alias_edge[edge[1],edge[0],p,q]
+        alias_edges[edge] = get_alias_edge(G,edge[0],edge[1],p,q)
+        alias_edges[edge[1],edge[0]] = get_alias_edge(G,edge[1],edge[0],p,q)
 
     return alias_nodes, alias_edges
 
@@ -48,14 +55,16 @@ def node2VecWalk(n_G,u,l,alias_nodes,alias_edges):
     for walk_iter in range(l):
         curr = walk[-1]
         neighbors =sorted(n_G.neighbors(curr))
-        if len(walk) == 1:
-            s = neighbors[alias_draw(alias_nodes[curr][0],alias_nodes[curr][1])]
+        if len(neighbors) > 0:
+            if len(walk) == 1:
+                s = neighbors[alias_draw(alias_nodes[curr][0],alias_nodes[curr][1])]
+                
+            else:
+                src = walk[-2]
+                s = neighbors[alias_draw(alias_edges[(src,curr)][0], alias_edges[(src,curr)][1])]
+            walk.append(s)
         else:
-            src = walk[-2]
-            s = neighbors[alias_draw(alias_edges[(src,curr)][0], alias_edges[(src,curr)][1])]
-        ##AliasSample()
-        walk.append[s]
-    print(walk)
+            break
     return walk
 
 
@@ -100,7 +109,6 @@ def alias_setup(probs):
 
 def alias_draw(J, q):
     K  = len(J)
-
     # Draw from the overall uniform mixture.
     kk = int(np.floor(npr.rand()*K))
 
@@ -129,13 +137,13 @@ def get_alias_edge(G,src,dst,p,q):
         alias_setup(normalized_probs) -- normalized probabilitry distribution of edges for biased random walk
     """
     probs = []
-    for nbr in dst.neighbors():
+    for nbr in G.neighbors(dst):
         if nbr == src:
-            prob = G[nbr][dst]['weight']/p
+            prob = G[dst][nbr]['weights']/p
         elif G.has_edge(src,nbr):
-            prob = G[src][nbr] = 1
+            prob = 1
         else:
-            prob = G[nbr][dst]['weight']/q
+            prob = G[dst][nbr]['weights']/q
         probs.append(prob)
     Z = sum(probs) ##normalizing constant
     normalized_probs = [prob/Z for prob in probs]
