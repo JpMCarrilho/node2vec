@@ -3,9 +3,9 @@ import tensorflow as tf
 import numpy as np
 import numpy.random as npr
 
-def PreProcessModifedWeights(G,p,q):
+def PreProcessModifedweight(G,p,q):
     """
-    Process weights for Alias sampling
+    Process weight for Alias sampling
     
     Arguments:
         G {Graph} -- Graph to be processed
@@ -16,17 +16,19 @@ def PreProcessModifedWeights(G,p,q):
         n_G -- updated graph
     """
     alias_nodes = {}
+    G = G.to_undirected()
     print(G.edges(data=True))
     for node in G.nodes():
         
-        probs = [G[node][nbr]['weights'] for nbr in sorted(G.neighbors(node))]
-        
+        probs = [G[node][nbr]['weight'] for nbr in sorted(G.neighbors(node))]
+        print(len(sorted(G.neighbors(node))))
+        #print(G.neighbors(node))
         Z = sum(probs) ##normalizing constant
-        print(probs)
-        normalized_probs = [float(prob/Z) for prob in probs]
+        #print(probs)
+        normalized_probs = [float(prob)/Z for prob in probs]
+        #print(normalized_probs)
         alias_nodes[node] = alias_setup(normalized_probs)
-    print(normalized_probs)
-    #print(alias_nodes)
+    
         
     
     alias_edges = {}
@@ -68,9 +70,9 @@ def node2VecWalk(n_G,u,l,alias_nodes,alias_edges):
     return walk
 
 
-def start_weights(G):
+def start_weight(G):
     for edge in G.edges():
-        G[edge[0]][edge[1]]['weights'] = 1
+        G[edge[0]][edge[1]]['weight'] = 1
     return G
 
 
@@ -139,11 +141,11 @@ def get_alias_edge(G,src,dst,p,q):
     probs = []
     for nbr in G.neighbors(dst):
         if nbr == src:
-            prob = G[dst][nbr]['weights']/p
+            prob = G[dst][nbr]['weight']/p
         elif G.has_edge(src,nbr):
             prob = 1
         else:
-            prob = G[dst][nbr]['weights']/q
+            prob = G[dst][nbr]['weight']/q
         probs.append(prob)
     Z = sum(probs) ##normalizing constant
     normalized_probs = [prob/Z for prob in probs]
