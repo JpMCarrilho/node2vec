@@ -1,6 +1,6 @@
 import networkx as nx
 import numpy as np
-from utils2 import alias_draw, alias_setup
+from utils import alias_draw, alias_setup
 class node2vec():
     def __init__(self,G,p,q,l):
         self.G = G
@@ -8,6 +8,9 @@ class node2vec():
         self.q = q
         self.l = l
 
+        self.G = self.start_weights(G)
+        self.PreProcessModifiedWeights(self.G,self.p,self.q)
+        
     def start_weights(self,G):
         """
         Initializes the weights of the graph's edges to 1
@@ -37,7 +40,7 @@ class node2vec():
         self.q = q
         alias_nodes = {}
         for node in G.nodes():
-            unnormalized_probs = [G[node][nbr]['weight'] for nbr in G.neighbors(node)]
+            unnormalized_probs = [G[node][nbr]['weight'] for nbr in sorted(G.neighbors(node))]
             Z = sum(unnormalized_probs)
             normalized_probs = [float(prob)/Z for prob in unnormalized_probs]
             alias_nodes[node] = alias_setup(normalized_probs)
@@ -47,13 +50,13 @@ class node2vec():
         
         for edge in G.edges():
             alias_edges[edge] = self.get_alias_edge(G,edge[0],edge[1],p,q)
-            alias_edges[edge[1],edge[0]] = self.get_alias_edge(G,edge[1],edge[0],p,q)
+            alias_edges[(edge[1],edge[0])] = self.get_alias_edge(G,edge[1],edge[0],p,q)
         
         self.alias_nodes = alias_nodes
         self.alias_edges = alias_edges
         #print(alias_edges)
         #print(alias_nodes)
-
+        return
     def get_alias_edge(self,G,src,dst,p,q):
         """
         Prepare probabilities of edges for Second Order random walk
@@ -85,11 +88,6 @@ class node2vec():
         l =  self.l
         p = self.p
         q = self.q
-
-
-        G = self.start_weights(G)
-        
-        self.PreProcessModifiedWeights(G,p,q)
         walk = [u]
         for step in range(l):
             curr = walk[-1]

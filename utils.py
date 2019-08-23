@@ -1,5 +1,8 @@
 import numpy as np
 import numpy.random as npr
+from sklearn.manifold import TSNE
+import pandas as pd 
+import matplotlib.pyplot as plt
 
 def alias_setup(probs):
     K       = len(probs)
@@ -46,3 +49,21 @@ def alias_draw(J, q):
         return kk
     else:
         return J[kk]
+
+def visualize(vocab,embeddings):
+    """
+    plot a 2d t-sne of the generated embeddings
+    
+    Arguments:
+        embeddings {array} -- vector with n-dimension features for each point
+    """
+    tsne = TSNE(n_components = 2,random_state = 0)
+    X_tsne = tsne.fit_transform(embeddings)
+    df = pd.DataFrame(X_tsne,index=vocab,columns = ['x','y'])
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    ax.scatter(df['x'], df['y'])
+    for word, pos in df.iterrows():
+        ax.annotate(word, pos)
+    plt.show()
