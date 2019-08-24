@@ -83,12 +83,11 @@ class node2vec():
         
         return alias_setup(normalized_probs)
 
-    def node2vecWalk(self,G,u,l):
+    def node2vecWalk(self,u,l):
         G = self.G
         l =  self.l
-        p = self.p
-        q = self.q
         walk = [u]
+        
         for step in range(l):
             curr = walk[-1]
             
@@ -100,10 +99,11 @@ class node2vec():
                 else:
                     src = walk[-2]
                 
-                    s = neighbors[alias_draw(self.alias_edges[src,curr][0],self.alias_edges[src,curr][1])]
+                    s = neighbors[alias_draw(self.alias_edges[(src,curr)][0],self.alias_edges[(src,curr)][1])]
+                walk.append(s)
             else:
                 break
-            walk.append(s)
+            
         return walk
             
 

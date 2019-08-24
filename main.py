@@ -11,21 +11,23 @@ def main():
     n_G = n_G.to_undirected()
     
     l = 80 #length of random walk
-    n_walks = 10 #number of random walks
+    n_walks = 30 #number of random walks
     context_size = 10
     embedding_dim  = 2
-    p = 1
+    p = 0.5
     q = 1
     walks = []
     nodes = list(n_G.nodes())
     visualize = True
     
     n2v = node2vec.node2vec(n_G,p,q,l)
+    
     for r in range(n_walks):
-        print("Walk " + str(r))
+        print("Walk " + str(r+1))
         shuffle(nodes)
+        print(nodes)
         for node in nodes:
-            walk = n2v.node2vecWalk(n_G,node,l)
+            walk = n2v.node2vecWalk(node,l)
             walks.append(walk)
 
     walks = [map(str,walk) for walk in walks]

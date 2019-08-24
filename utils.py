@@ -57,9 +57,9 @@ def visualize(vocab,embeddings):
     Arguments:
         embeddings {array} -- vector with n-dimension features for each point
     """
-    tsne = TSNE(n_components = 2,random_state = 0)
-    X_tsne = tsne.fit_transform(embeddings)
-    df = pd.DataFrame(X_tsne,index=vocab,columns = ['x','y'])
+    #tsne = TSNE(n_components = 2,random_state = 0)
+    #X_tsne = tsne.fit_transform(embeddings)
+    df = pd.DataFrame(embeddings,index=vocab,columns = ['x','y'])
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
 
