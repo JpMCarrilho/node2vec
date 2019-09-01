@@ -2,10 +2,11 @@ import numpy as np
 import tensorflow as tf
 
 ## todo corpus = 
-def pre_encoding(sentences):
+def pre_encoding(sentences,window_size):
     words = []
     for sentence in sentences:
-        words.append(word for word in sentence)
+        for word in sentence:
+            words.append(word)
 
     words = set(words)
 
@@ -16,26 +17,27 @@ def pre_encoding(sentences):
     for i,word in enumerate(words):
         word2int[word] = i
         int2word[i] = word
-    return word2int, int2word
 
     data = []
     ## window_size = args 
 
     for sentence in sentences:
-        for word_index, word in enumarate(sentence)
-            for nb_word in sentence[max(word_index - window_size,0): min(word_index + window_size,len(sentences))+1])]:
+        for word_index, word in enumerate(sentence):
+            for nb_word in sentence[max(word_index - window_size,0): min(word_index + window_size,len(sentence))+1]:
                 if nb_word != word:
                       data.append([word,nb_word]) 
-    return data,word2int,int2word
+    return words,data,word2int,int2word
 
 def to_one_hot(data_point_index, vocab_size):
     temp = np.zeros(vocab_size)
     temp[data_point_index] = 1
     return temp
 
-def word2vec(vocab_size,window_size,embedding_dim,n_iters)
+def model(sentences,window_size,embedding_dim,n_iters):
     x_train = []
     y_train = []
+    words,data,word2int,int2word = pre_encoding(sentences,window_size)
+    vocab_size = len(words)
 
     for data_word in data:
         x_train.append(to_one_hot(word2int[data_word[0]], vocab_size))
@@ -54,7 +56,7 @@ def word2vec(vocab_size,window_size,embedding_dim,n_iters)
     W2 = tf.Variable(tf.random_normal([embedding_dim, vocab_size]))
     b2 = tf.Variable(tf.random_normal([vocab_size]))
 
-    prediction = tf.nn.sofmax(tf.add(tf.matmul(hidden,W2),b2))
+    prediction = tf.nn.softmax(tf.add(tf.matmul(hidden,W2),b2))
 
     sess = tf.Session()
 
@@ -64,11 +66,10 @@ def word2vec(vocab_size,window_size,embedding_dim,n_iters)
 
     loss = tf.reduce_mean(-tf.reduce_sum(y_label * tf.log(prediction),reduction_indices = [1]))
 
-    train_step = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
+    train_step = tf.train.GradientDescentOptimizer(0.2).minimize(loss)
     
     for _ in range(n_iters):
         sess.run(train_step,feed_dict = {x: x_train, y_label:y_train})
-        vectors = sess.run(W1 + b1)
         print('loss is: ', sess.run(loss, feed_dict={x:x_train,y_label:y_train}))
-
-    return(vectors)
+    vectors = sess.run(W1 + b1)
+    return vectors,word2int
