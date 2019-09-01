@@ -14,8 +14,8 @@ def main():
     n_walks = 30 #number of random walks
     context_size = 10
     embedding_dim  = 2
-    p = 0.5
-    q = 1
+    p = 1
+    q = 2
     walks = []
     nodes = list(n_G.nodes())
     visualize = True
